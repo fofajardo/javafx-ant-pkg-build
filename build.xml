@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="do-installer" name="JavaFX Deployment">
+    <property name="app.vendor" value="Vendor Name"/>
+    <property name="app.title" value="App Name"/>
+    <property name="app.version" value="0.0.0"/>
+    <property name="app.mainClass" value="app.Main"/>
+    <property name="app.outJar" value="src.jar"/>
+
+    <property name="dir.javafxsdk" value="C:\dev\java\jfx20"/>
+    <property name="dir.dist" value="dist"/>
+    <property name="dir.dist.bin" value="${dir.dist}/bin"/>
+    <property name="dir.dist.jmods" value="${dir.dist}/jmods"/>
+    <property name="dir.dist.runtime" value="${dir.dist}/rt-image"/>
+    <property name="dir.dist.installer" value="${dir.dist}/installer"/>
+
+    <target name="do-jar">
+        <delete dir="${dir.dist.bin}"/>
+        <jar destfile="${dir.dist.bin}/${app.outJar}">
+            <manifest>
+                <attribute name="Main-Class" value="${app.mainClass}"/>
+                <attribute name="Class-Path" value="."/>
+				<attribute name="Implementation-Vendor" value="${app.vendor}"/>
+				<attribute name="Implementation-Title" value="${app.title}"/>
+				<attribute name="Implementation-Version" value="${app.version}"/>
+            </manifest>
+            <fileset dir="../bin"/>
+        </jar>
+    </target>
+
+    <target name="do-staging">
+		<copy todir="${dir.dist.jmods}">
+			<fileset dir="${dir.javafxsdk}/jmods">
+				<include name="*"/>
+			</fileset>
+		</copy>
+        <delete dir="${dir.dist.runtime}"/>
+        <exec executable="jlink" failonerror="true">
+            <arg line="--strip-native-commands"/>
+            <arg line="--no-header-files"/>
+            <arg line="--no-man-pages"/>
+            <arg line="--compress=2"/>
+            <arg line="--strip-debug"/>
+            <arg line="--module-path ${dir.dist.jmods}"/>
+            <arg line="--add-modules ALL-MODULE-PATH"/>
+            <arg line="--output ${dir.dist.runtime}"/>
+        </exec>
+    </target>
+
+    <target name="do-installer">
+        <delete dir="${dir.dist.installer}"/>
+        <exec executable="jpackage" failonerror="true">
+            <arg line="--type msi"/>
+            <arg line="--dest ${dir.dist.installer}"/>
+            <arg line="--input ${dir.dist.bin}"/>
+            <arg line="--main-class ${app.mainClass}"/>
+            <arg line="--main-jar ${app.outJar}"/>
+            <arg line="--runtime-image ${dir.dist.runtime}"/>
+            <arg line="--name &quot;${app.title}&quot;"/>
+            <arg line="--app-version &quot;${app.version}&quot;"/>
+            <arg line="--vendor &quot;${app.vendor}&quot;"/>
+            <arg line="--win-dir-chooser --win-menu --win-per-user-install --win-shortcut"/>
+        	<arg line="--license-file LICENSE.txt"/>
+    		<arg line="--icon ICON.ico"/>
+        </exec>
+    </target>
+
+    <target name="do-deploy" depends="do-jar, do-staging, do-installer">
+    </target>
+
+    <target name="do-deploy-legacy" depends="do-jar">
+        <delete dir="${dir.dist.bin}/bin"/>
+        <mkdir dir="${dir.dist.bin}/bin"/>
+		<copy todir="${dir.dist.bin}/bin">
+			<fileset dir="${dir.javafxsdk}/bin">
+				<include name="*"/>
+			</fileset>
+		</copy>
+
+        <delete dir="${dir.dist.bin}/lib"/>
+        <mkdir dir="${dir.dist.bin}/lib"/>
+		<copy todir="${dir.dist.bin}/lib">
+			<fileset dir="${dir.javafxsdk}/lib">
+				<include name="*"/>
+			</fileset>
+		</copy>
+
+        <copy file="run.bat" todir="${dir.dist.bin}"/>
+    </target>
+</project>

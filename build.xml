@@ -139,21 +139,4 @@
     </target>
     <target name="do-deploy" depends="do-jar, do-staging, do-package">
     </target>
-    <target name="do-deploy-legacy" depends="do-jar">
-        <delete dir="${dir.dist.jar}/bin"/>
-        <mkdir dir="${dir.dist.jar}/bin"/>
-        <copy todir="${dir.dist.jar}/bin">
-            <fileset dir="${dir.sdk.javafx}/bin">
-                <include name="*"/>
-            </fileset>
-        </copy>
-        <delete dir="${dir.dist.jar}/lib"/>
-        <mkdir dir="${dir.dist.jar}/lib"/>
-        <copy todir="${dir.dist.jar}/lib">
-            <fileset dir="${dir.sdk.javafx}/lib">
-                <include name="*"/>
-            </fileset>
-        </copy>
-        <copy file="run.bat" todir="${dir.dist.jar}"/>
-    </target>
 </project>

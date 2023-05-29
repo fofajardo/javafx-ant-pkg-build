@@ -10,7 +10,8 @@
     <!-- Packaging -->
     <property name="app.package.license" value="LICENSE.txt"/>
     <property name="app.package.icon" value="ICON.ico"/>
-    <property name="app.package.flags.win" value="--win-dir-chooser --win-menu --win-per-user-install --win-shortcut"/>
+    <property name="app.package.flags.win"
+              value="--win-menu --win-menu-group &quot;${app.title}&quot; --win-dir-chooser --win-per-user-install --win-shortcut"/>
     <property name="app.package.type.win" value="msi"/>
     <property name="app.package.type.unix" value=""/>
     <property name="app.package.type.mac" value=""/>
